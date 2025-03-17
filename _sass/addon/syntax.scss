@@ -65,7 +65,7 @@ html {
   }
 
   pre {
-    font-family: "Fira Code", "Microsoft Yahei", monospace;
+    font-family: 'Microsoft Yahei', monospace;
     font-variant-ligatures: normal;
     margin-bottom: 0;
     font-size: $code-font-size;
@@ -107,7 +107,7 @@ code {
   -webkit-hyphens: none;
   -ms-hyphens: none;
   hyphens: none;
-  font-family: "Fira Code", "Microsoft Yahei", monospace;
+  font-family: 'Microsoft Yahei', monospace;
   font-variant-ligatures: none;
   color: var(--code-color);
 

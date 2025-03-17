@@ -53,9 +53,6 @@ clipboard:
 mathjax:
   js: https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js
 
-firacode:
-  css: https://cdn.jsdelivr.net/npm/firacode@6.2.0/distr/fira_code.css
-
 socket-io-client:
   js: https://cdn.jsdelivr.net/npm/socket.io-client@2/dist/socket.io.min.js
 
@@ -75,4 +72,4 @@ iconfont:
     # 此 css 包含以 'icon-' 为前缀的图标，为模板的核心图标，请勿删除。
     - https://at.alicdn.com/t/c/font_2440352_o7nixqud1l.css
     # 添加你的 Iconfont 图标链接
-    # - 
+    # -
