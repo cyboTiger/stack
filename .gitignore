@@ -31,3 +31,8 @@ package-lock.json
 !.vscode/settings.json
 !.vscode/extensions.json
 !.vscode/tasks.json
+<<<<<<< HEAD
+=======
+
+# Misc
+>>>>>>> 22b9497 (chore: initialize the environment)

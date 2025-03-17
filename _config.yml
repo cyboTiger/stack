@@ -8,8 +8,13 @@ theme: jekyll-theme-chirpy
 # 否则，布局语言使用默认值 'en'。
 lang: zh-CN
 
+<<<<<<< HEAD
 # 修改为你的时区 › https://kevinnovak.github.io/Time-Zone-Picker
 timezone: Asia/Shanghai
+=======
+# Change to your timezone › https://kevinnovak.github.io/Time-Zone-Picker
+timezone:
+>>>>>>> 22b9497 (chore: initialize the environment)
 
 # jekyll-seo-tag 设置 › https://github.com/jekyll/jekyll-seo-tag/blob/master/docs/usage.md
 # --------------------------
@@ -89,11 +94,23 @@ pageviews:
 #
 theme_mode: # [light | dark]
 
+<<<<<<< HEAD
 # 启用动画背景特效
 backgroud_animation: false
 
 # 启用鼠标点击特效
 mouse_click_effect: false
+=======
+# The CDN endpoint for media resources.
+# Notice that once it is assigned, the CDN url
+# will be added to all media resources (site avatar, posts' images, audio and video files) paths starting with '/'
+#
+# e.g. 'https://cdn.com'
+cdn:
+
+# the avatar on sidebar, support local or CORS resources
+avatar:
+>>>>>>> 22b9497 (chore: initialize the environment)
 
 # 媒体资源 CDN 端点。
 # 注意一旦被分配，CDN 网址会被加在
