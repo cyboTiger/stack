@@ -20,18 +20,15 @@ tagline: Nichts Hsu # 副标题
 description: >- # 由 seo meta 和 atom feed 使用
   Nichts Hsu 的个人博客
 
-<<<<<<< HEAD
 # 填入你的网站的协议和域名.
 # 例如，'https://username.github.io'，注意不要以 '/' 结尾。
-url: "https://nihil.cc"
-=======
+url: "https://cybotiger.github.io"
+
 description: >- # used by seo meta and the atom feed
   A minimal, responsive and feature-rich Jekyll theme for technical writing.
 
 # Fill in the protocol & hostname for your site.
 # E.g. 'https://username.github.io', note that it does not end with a '/'.
-url: "cybotiger.github.io"
->>>>>>> 43b5d58 (chore: initial conf)
 
 github:
   username: NichtsHsu # Github 用户名
@@ -98,13 +95,11 @@ pageviews:
 #
 theme_mode: # [light | dark]
 
-<<<<<<< HEAD
 # 启用动画背景特效
 backgroud_animation: false
 
 # 启用鼠标点击特效
 mouse_click_effect: false
-=======
 # The CDN endpoint for media resources.
 # Notice that once it is assigned, the CDN url
 # will be added to all media resources (site avatar, posts' images, audio and video files) paths starting with '/'
@@ -113,15 +108,12 @@ mouse_click_effect: false
 cdn:
 
 # the avatar on sidebar, support local or CORS resources
-avatar:
->>>>>>> 22b9497 (chore: initialize the environment)
 
 # 媒体资源 CDN 端点。
 # 注意一旦被分配，CDN 网址会被加在
 # 所有以 '/' 开始的媒体资源（网站头像，帖子中的图像，音频和视频文件）路径上
 # 
 # 例如，'https://cdn.com'
-cdn: ""
 
 # 侧边栏的头像，支持本地或 CROS 资源
 avatar: /avatar.png
@@ -197,13 +189,8 @@ pwa:
 # 每一页的帖子数量
 paginate: 10
 
-<<<<<<< HEAD
-# 网站的基础 URL
-baseurl: ""
-=======
 # The base URL of your site
 baseurl: "/stack"
->>>>>>> 43b5d58 (chore: initial conf)
 
 # ------------ 下面的设置不建议修改 ------------------
 
