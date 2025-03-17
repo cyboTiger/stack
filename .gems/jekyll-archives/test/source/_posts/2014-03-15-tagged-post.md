@@ -1,4 +1,5 @@
 ---
+layout: post
 title: Tagged post
 tags: ["Test Tag", tagged]
 ---
