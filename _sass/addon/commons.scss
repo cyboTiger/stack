@@ -118,7 +118,7 @@ blockquote {
     @extend %rounded;
 
     &::before {
-      font-family: "iconfont";
+      font-family: 'iconfont';
       text-align: center;
       width: 3rem;
       position: absolute;
@@ -326,7 +326,8 @@ sup {
   margin-bottom: 1.5rem;
   overflow-x: auto;
   border-radius: 0.25rem;
-  box-shadow: 0 1px 2px rgba(var(--tb-shade-color), 0.12), 0 3px 10px rgba(var(--tb-shade-color), 0.08);
+  box-shadow: 0 1px 2px rgba(var(--tb-shade-color), 0.12),
+    0 3px 10px rgba(var(--tb-shade-color), 0.08);
 
   > table {
     display: table;
@@ -675,7 +676,7 @@ main {
 
 /* Overwrite bootstrap tooltip */
 .tooltip-inner {
-/* Overrided BS4 Tooltip */
+  /* Overrided BS4 Tooltip */
   font-size: 0.7rem;
   max-width: 220px;
   text-align: left;
@@ -1722,7 +1723,12 @@ details {
       @for $i from 0 through 50 {
         &:nth-child(#{$i}) {
           --circle-left: #{random_range(0%, 100%)};
-          --circle-background: rgba(#{random_range(0, 255)}, #{random_range(0, 255)}, #{random_range(0, 255)}, 0.06);
+          --circle-background: rgba(
+            #{random_range(0, 255)},
+            #{random_range(0, 255)},
+            #{random_range(0, 255)},
+            0.06
+          );
           --circle-side-length: #{random_range(20px, 200px)};
           --circle-time: #{random_range(10s, 45s)};
           --circle-delay: #{random_range(0s, 25s)};

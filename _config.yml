@@ -6,19 +6,19 @@ theme: jekyll-theme-chirpy
 # 站点的语言 › https://www.w3.org/International/questions/qa-choosing-language-tags
 # 如果在文件夹 `_data/locales` 下存在同名文件，则布局语言也会改变，
 # 否则，布局语言使用默认值 'en'。
-lang: zh-CN
+lang: en
 
 # 修改为你的时区 › https://kevinnovak.github.io/Time-Zone-Picker
 timezone: Asia/Shanghai
 
 # jekyll-seo-tag 设置 › https://github.com/jekyll/jekyll-seo-tag/blob/master/docs/usage.md
 # --------------------------
-title: Nihil # 主标题
+title: cyboTiger # 主标题
 
-tagline: Nichts Hsu # 副标题
+tagline: ML stack # 副标题
 
 description: >- # 由 seo meta 和 atom feed 使用
-  Nichts Hsu 的个人博客
+  cyboTiger 的个人博客
 
 # 填入你的网站的协议和域名.
 # 例如，'https://username.github.io'，注意不要以 '/' 结尾。
@@ -28,21 +28,21 @@ url: "https://cybotiger.github.io"
 # E.g. 'https://username.github.io', note that it does not end with a '/'.
 
 github:
-  username: NichtsHsu # Github 用户名
+  username: cybotiger # Github 用户名
 
 twitter:
-  username: NichtsHsu # 推特用户名
+  username: zhruhn643327 # 推特用户名
 
 social:
   # 改为你的全名。
   # 这将会显示为帖子的默认作者以及页脚的版权所有者
-  name: Nichts Hsu
-  email: NichtsVonChaos@gmail.com # 邮箱地址
+  name: cybotiger
+  email: ruihanzhu.tiger@gmail.com # 邮箱地址
   links:
     # 第一个链接将会作为版权所有者的链接
-    - https://nihil.cc/
-    - https://twitter.com/NichtsHsu # 推特主页
-    - https://github.com/NichtsHsu # Github 主页
+    - https://cybotiger.github.io/
+    - https://twitter.com/zhruhn643327 # 推特主页
+    - https://github.com/cybotiger # Github 主页
     # 取消注释以添加更多链接
     # - https://www.facebook.com/username
     # - https://www.linkedin.com/in/username
@@ -93,7 +93,7 @@ pageviews:
 theme_mode: # [light | dark]
 
 # 启用动画背景特效
-backgroud_animation: false
+backgroud_animation: true
 
 # 启用鼠标点击特效
 mouse_click_effect: false
@@ -113,7 +113,7 @@ cdn:
 # 例如，'https://cdn.com'
 
 # 侧边栏的头像，支持本地或 CROS 资源
-avatar: /avatar.png
+avatar: /kagula.png
 
 # SEO `og:image` 元标记中使用的全站社交预览图像的 URL。
 # 可以在帖子的 Front Matter 中使用 `page.image` 覆盖。
