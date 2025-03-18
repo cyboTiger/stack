@@ -6,7 +6,7 @@ theme: jekyll-theme-chirpy
 # 站点的语言 › https://www.w3.org/International/questions/qa-choosing-language-tags
 # 如果在文件夹 `_data/locales` 下存在同名文件，则布局语言也会改变，
 # 否则，布局语言使用默认值 'en'。
-lang: en
+lang: zh-CN
 
 # 修改为你的时区 › https://kevinnovak.github.io/Time-Zone-Picker
 timezone: Asia/Shanghai
@@ -130,11 +130,11 @@ panel:
   #   的方式为该帖子单独关闭右侧边栏的功能。
   post:
     # 最近更新
-    lastmod: true
+    lastmod: false
     # 热门标签
     trending_tags: false
     # 外部链接
-    external_links: true
+    external_links: false
     # 目录
     toc: true
 
@@ -169,7 +169,7 @@ comments:
 # 自托管静态资产，可选 › https://github.com/cotes2020/chirpy-static-assets
 assets:
   self_host:
-    enabled: true # 布尔值, 置空表示否
+    enabled: false # 布尔值, 置空表示否
     # 指定 Jekyll 环境，置空意味着都启用
     # 仅在 `assets.self_host.enabled` 为 'true' 时生效
     env: # [development|production]

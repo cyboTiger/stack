@@ -1,10 +1,9 @@
 ---
-layout: about
 title: 关于
 icon: icon-info
-order: 5
+order: 4
 ---
 
 ## 关于我
 
-建设中...
+此处填入您想要展示的信息。

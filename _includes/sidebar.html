@@ -43,7 +43,7 @@
   <div class="sidebar-bottom d-flex flex-wrap  align-items-center w-100">
     {% unless site.theme_mode %}
       <button type="button" class="btn btn-link nav-link" aria-label="Switch Mode" id="mode-toggle">
-       <i class="iconfont icon-adjust1"></i>
+       <i class="fas fa-adjust"></i>
       </button>
 
       {% if site.data.contact.size > 0 %}
@@ -60,7 +60,7 @@
         {% when 'email' %}
           {% assign email = site.social.email | split: '@' %}
           {%- capture url -%}
-            javascript:location.href = 'mailto:' + ['{{ email[0] }}','{{ email[1] }}'].join('@')
+            mailto:{{ email[0] }}@{{ email[1] }}
           {%- endcapture -%}
         {% when 'rss' %}
           {% assign url = '/feed.xml' | relative_url %}

@@ -4,7 +4,7 @@ description: >-
   RL基础
 author: cybotiger
 date: 2025-03-17 12:00:00 +0800
-categories: [RL, Algorithm]
+categories: [RL, paper reading]
 tags: [强化学习]
 pin: true
 math: true
@@ -37,3 +37,37 @@ $$
 $$
 
 其中轨迹 $\tau$ 是agent与环境交互产生的状态-动作轨迹 $(s_1,a_1,s_2,a_2,...)$，服从 $\pi_\theta$ 的概率分布
+
+```python
+import torch
+
+class ActorCritic(nn.Module):
+    def __init__(self, state_dim, action_dim, hidden_dim):
+        super(ActorCritic, self).__init__()
+        self.actor = nn.Sequential(
+            nn.Linear(state_dim, hidden_dim),
+            nn.ReLU(),
+            nn.Linear(hidden_dim, action_dim),
+            nn.Softmax(dim=1)
+        )
+        self.critic = nn.Sequential(
+            nn.Linear(state_dim, hidden_dim),
+            nn.ReLU(),
+            nn.Linear(hidden_dim, 1)
+        )
+        self.optimizer = torch.optim.Adam(self.parameters(), lr=0.001)
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.to(self.device)
+        self.action_dim = action_dim
+        self.state_dim = state_dim
+        self.hidden_dim = hidden_dim
+        self.gamma = 0.99
+        self.eps = 1e-8
+        self.log_probs = []
+        self.rewards = []
+        self.values = []
+        self.returns = []
+        self.is_training = True
+        self.reset()
+        
+```
