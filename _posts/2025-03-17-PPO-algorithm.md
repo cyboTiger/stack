@@ -4,7 +4,7 @@ description: >-
   RL基础
 author: cybotiger
 date: 2025-03-17 12:00:00 +0800
-categories: [RL, paper]
+categories: [paper]
 tags: [强化学习, openai]
 pin: true
 math: true
