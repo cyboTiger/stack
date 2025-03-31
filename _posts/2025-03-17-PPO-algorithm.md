@@ -4,12 +4,14 @@ description: >-
   RL基础
 author: cybotiger
 date: 2025-03-17 12:00:00 +0800
-categories: [paper]
+categories: [paper, RL]
 tags: [强化学习, openai]
 pin: true
 math: true
 mermaid: true
 ---
+
+![]()
 
 ## 1. 传统策略梯度算法
 
@@ -38,36 +40,115 @@ $$
 
 其中轨迹 $\tau$ 是agent与环境交互产生的状态-动作轨迹 $(s_1,a_1,s_2,a_2,...)$，服从 $\pi_\theta$ 的概率分布
 
-```python
-import torch
 
-class ActorCritic(nn.Module):
-    def __init__(self, state_dim, action_dim, hidden_dim):
-        super(ActorCritic, self).__init__()
-        self.actor = nn.Sequential(
-            nn.Linear(state_dim, hidden_dim),
-            nn.ReLU(),
-            nn.Linear(hidden_dim, action_dim),
-            nn.Softmax(dim=1)
-        )
-        self.critic = nn.Sequential(
-            nn.Linear(state_dim, hidden_dim),
-            nn.ReLU(),
-            nn.Linear(hidden_dim, 1)
-        )
-        self.optimizer = torch.optim.Adam(self.parameters(), lr=0.001)
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.to(self.device)
-        self.action_dim = action_dim
-        self.state_dim = state_dim
-        self.hidden_dim = hidden_dim
-        self.gamma = 0.99
-        self.eps = 1e-8
-        self.log_probs = []
-        self.rewards = []
-        self.values = []
-        self.returns = []
-        self.is_training = True
-        self.reset()
-        
-```
+
+## [AUX] 术语介绍
+在强化学习中，**优势函数（A）**、**价值函数（V）** 和 **奖励（R）** 是核心概念，它们共同描述了智能体在环境中的决策依据和长期收益的评估。以下是它们的定义、区别和关系：
+
+---
+
+### 1. **奖励（R, Reward）**
+   - **定义**：  
+     奖励是环境在智能体执行某个动作后给出的**即时反馈信号**（标量值），表示该动作的短期好坏。  
+     - 例如：游戏中得分增加（+1）、碰撞障碍物（-10）。
+   - **数学表示**：  
+     \( R_t \) 表示时间步 \( t \) 的即时奖励。
+   - **特点**：  
+     - 完全由环境决定，是强化学习中最基础的信号。
+     - 仅反映当前动作的瞬时效果，不包含长期信息。
+
+---
+
+### 2. **状态价值函数（V, State Value Function）**
+   - **定义**：  
+     状态价值函数 \( V^\pi(s) \) 表示在状态 \( s \) 下，**遵循策略 \( \pi \) 后能获得的预期累积奖励**（考虑未来奖励的折扣）。  
+     - 回答：“当前状态 \( s \) 长期来看有多好？”
+   - **数学表示**：  
+     \[
+     V^\pi(s) = \mathbb{E}_{\pi} \left[ \sum_{k=0}^\infty \gamma^k R_{t+k} \mid S_t = s \right]
+     \]
+     - \( \gamma \in [0,1] \) 是折扣因子，平衡即时奖励和未来奖励的重要性。
+   - **特点**：  
+     - 评价的是**状态**的长期价值，与具体动作无关。
+     - 由策略 \( \pi \) 决定（不同策略下同一状态的价值可能不同）。
+
+---
+
+### 3. **优势函数（A, Advantage Function）**
+   - **定义**：  
+     优势函数 \( A^\pi(s,a) \) 表示在状态 \( s \) 下执行动作 \( a \) **相比策略 \( \pi \) 的平均水平有多好**。  
+     - 回答：“在状态 \( s \) 下选择动作 \( a \) 比默认策略好多少？”
+   - **数学表示**：  
+     \[
+     A^\pi(s,a) = Q^\pi(s,a) - V^\pi(s)
+     \]
+     其中 \( Q^\pi(s,a) \) 是动作价值函数（即状态-动作对的预期累积奖励）。
+   - **特点**：  
+     - 若 \( A > 0 \)，说明动作 \( a \) 优于策略 \( \pi \) 的平均水平；反之则劣于平均水平。
+     - 用于减少策略梯度的方差（如Actor-Critic方法）。
+
+---
+
+### 三者的关系
+#### 1. **数学关系**  
+   - **动作价值函数 \( Q^\pi(s,a) \)** 是核心桥梁：  
+     \[
+     Q^\pi(s,a) = \mathbb{E}_{\pi} \left[ R_t + \gamma V^\pi(S_{t+1}) \mid S_t=s, A_t=a \right]
+     \]
+   - **优势函数** 通过 \( Q \) 和 \( V \) 计算：  
+     \[
+     A^\pi(s,a) = Q^\pi(s,a) - V^\pi(s)
+     \]
+   - **价值函数 \( V \)** 是 \( Q \) 对动作的期望：  
+     \[
+     V^\pi(s) = \mathbb{E}_{a \sim \pi} \left[ Q^\pi(s,a) \right]
+     \]
+
+#### 2. **直观理解**  
+   - **奖励 \( R \)** 是即时反馈，**价值 \( V \)** 是长期评价，**优势 \( A \)** 是动作的相对优势。  
+   - **例子**（游戏场景）：  
+     - 当前状态 \( s \)：玩家面对敌人。  
+     - 动作 \( a \)：发射子弹。  
+     - \( R \)：击中敌人（+10），未击中（0）。  
+     - \( V(s) \)：当前状态的长期预期得分（如+50）。  
+     - \( Q(s,a) \)：选择“发射子弹”的长期预期得分（如+60）。  
+     - \( A(s,a) = Q(s,a) - V(s) = +10 \) → 发射子弹比平均策略更好。
+
+---
+
+### 关键区别
+| 概念          | 评价对象                | 依赖关系                     | 用途                             |
+|---------------|-------------------------|------------------------------|----------------------------------|
+| **奖励 \( R \)** | 即时动作的效果          | 由环境直接给出               | 策略优化的原始信号               |
+| **价值 \( V \)** | 状态的长期价值          | 依赖策略 \( \pi \)           | 评估状态好坏，作为基线           |
+| **优势 \( A \)** | 动作的相对优势          | \( A = Q - V \)              | 减少方差，指导策略更新方向       |
+
+---
+
+### 在PPO中的具体应用
+1. **计算优势函数**：  
+   PPO 使用广义优势估计（GAE）来平衡偏差和方差：  
+   \[
+   A_t^{\text{GAE}} = \sum_{k=0}^{T-t} (\gamma \lambda)^k \delta_{t+k}, \quad \delta_t = R_t + \gamma V(S_{t+1}) - V(S_t)
+   \]
+   - \( \lambda \) 是GAE的超参数，控制方差与偏差的权衡。
+
+2. **策略更新**：  
+   PPO 的损失函数利用优势函数 \( A \) 加权策略更新：  
+   \[
+   L^{\text{CLIP}} = -\mathbb{E} \left[ \min \left( r_t(\theta) A_t, \text{clip}(r_t(\theta), 1-\epsilon, 1+\epsilon) A_t \right) \right]
+   \]
+   - \( r_t(\theta) \) 是新旧策略的重要性采样比率。
+
+---
+
+### 总结
+- **奖励 \( R \)** 是环境的即时反馈，**价值 \( V \)** 是状态的长期评价，**优势 \( A \)** 是动作的相对改进潜力。  
+- **关系链**：  
+  \[
+  R \rightarrow Q \rightarrow \begin{cases}
+  V = \mathbb{E}_\pi [Q] \\
+  A = Q - V
+  \end{cases}
+  \]
+- 优势函数在策略梯度方法中至关重要，它帮助智能体识别哪些动作值得更多探索或利用。
