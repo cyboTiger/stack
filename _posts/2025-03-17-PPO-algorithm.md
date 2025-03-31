@@ -265,7 +265,7 @@ $$
 ### **2. Critic更新的输入数据**
 Critic的更新依赖于从环境中采样（或Actor生成）的轨迹数据，包括：
 - 状态序列 $ s_t $
-- 奖励序列 $ r_t $
+- 奖励序列 $ R_t $
 - 下一状态 $ s_{t+1} $
 - 终止标志 $ done_t $（可选）
 
@@ -276,11 +276,11 @@ Critic的更新依赖于从环境中采样（或Actor生成）的轨迹数据，
 Critic的目标是让 $ V(s_t) $ 逼近真实的累积奖励。目标值的计算方式有两种：
 - **蒙特卡洛（MC）目标**（适用于完整轨迹）：
   $$
-  V_{\text{target}}(s_t) = \sum_{k=0}^{T-t} \gamma^k r_{t+k}
+  V_{\text{target}}(s_t) = \sum_{k=0}^{T-t} \gamma^k R_{t+k}
   $$
 - **时序差分（TD）目标**（更常用）：
   $$
-  V_{\text{target}}(s_t) = r_t + \gamma (1 - done_t) V_{\text{old}}(s_{t+1})
+  V_{\text{target}}(s_t) = R_t + \gamma (1 - done_t) V_{\text{old}}(s_{t+1})
   $$
   其中：
   - $ V_{\text{old}}(s_{t+1}) $ 是**旧Critic网络**（或当前Critic在更新前的输出）对下一状态的估计。
