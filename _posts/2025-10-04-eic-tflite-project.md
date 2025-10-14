@@ -113,3 +113,804 @@ AttributeError: module 'keras._tf_keras.keras.layers' has no attribute 'Abstract
 ImportError: /home/ruihan/miniconda3/envs/deploy/lib/python3.10/site-packages/tensorflow/lite/python/metrics/_pywrap_tensorflow_lite_metrics_wrapper.so: 
 undefined symbol: Wrapped_PyInit__pywrap_tensorflow_lite_metrics_wrapper
 ```
+
+## Summary
+最大的问题在于，onnx 到 tensorflow 的转换库 onnx-tf 已经停止维护了。所以后续 onnx 库的更新添加更多算子时，很多就不能与旧版本的 tensorflow converter 兼容
+
+
+## Manually design tensorflow model
+### fbnet-a arch
+```python
+FBNet(
+  (backbone): FBNetBackbone(
+    (stages): Sequential(
+      (xif0_0): ConvBNRelu(
+        (conv): Conv2d(3, 16, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+        (bn): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+      )
+      (xif1_0): Identity()
+      (xif2_0): IRFBlock(
+        (pw): ConvBNRelu(
+          (conv): Conv2d(16, 48, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(48, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (dw): ConvBNRelu(
+          (conv): Conv2d(48, 48, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), groups=48)
+          (bn): BatchNorm2d(48, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (pwl): ConvBNRelu(
+          (conv): Conv2d(48, 24, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(24, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (xif2_1): IRFBlock(
+        (dw): ConvBNRelu(
+          (conv): Conv2d(24, 24, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=24)
+          (bn): BatchNorm2d(24, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (pwl): ConvBNRelu(
+          (conv): Conv2d(24, 24, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(24, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (res_conn): TorchAdd(
+          (add_func): FloatFunctional(
+            (activation_post_process): Identity()
+          )
+        )
+      )
+      (xif2_2): Identity()
+      (xif2_3): Identity()
+      (xif3_0): IRFBlock(
+        (pw): ConvBNRelu(
+          (conv): Conv2d(24, 144, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(144, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (dw): ConvBNRelu(
+          (conv): Conv2d(144, 144, kernel_size=(5, 5), stride=(2, 2), padding=(2, 2), groups=144)
+          (bn): BatchNorm2d(144, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (pwl): ConvBNRelu(
+          (conv): Conv2d(144, 32, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (xif3_1): IRFBlock(
+        (pw): ConvBNRelu(
+          (conv): Conv2d(32, 96, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (dw): ConvBNRelu(
+          (conv): Conv2d(96, 96, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=96)
+          (bn): BatchNorm2d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (pwl): ConvBNRelu(
+          (conv): Conv2d(96, 32, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (res_conn): TorchAdd(
+          (add_func): FloatFunctional(
+            (activation_post_process): Identity()
+          )
+        )
+      )
+      (xif3_2): IRFBlock(
+        (dw): ConvBNRelu(
+          (conv): Conv2d(32, 32, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=32)
+          (bn): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (pwl): ConvBNRelu(
+          (conv): Conv2d(32, 32, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (res_conn): TorchAdd(
+          (add_func): FloatFunctional(
+            (activation_post_process): Identity()
+          )
+        )
+      )
+      (xif3_3): IRFBlock(
+        (pw): ConvBNRelu(
+          (conv): Conv2d(32, 96, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (dw): ConvBNRelu(
+          (conv): Conv2d(96, 96, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=96)
+          (bn): BatchNorm2d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (pwl): ConvBNRelu(
+          (conv): Conv2d(96, 32, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (res_conn): TorchAdd(
+          (add_func): FloatFunctional(
+            (activation_post_process): Identity()
+          )
+        )
+      )
+      (xif4_0): IRFBlock(
+        (pw): ConvBNRelu(
+          (conv): Conv2d(32, 192, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (dw): ConvBNRelu(
+          (conv): Conv2d(192, 192, kernel_size=(5, 5), stride=(2, 2), padding=(2, 2), groups=192)
+          (bn): BatchNorm2d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (pwl): ConvBNRelu(
+          (conv): Conv2d(192, 64, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (xif4_1): IRFBlock(
+        (pw): ConvBNRelu(
+          (conv): Conv2d(64, 192, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (dw): ConvBNRelu(
+          (conv): Conv2d(192, 192, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=192)
+          (bn): BatchNorm2d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (pwl): ConvBNRelu(
+          (conv): Conv2d(192, 64, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (res_conn): TorchAdd(
+          (add_func): FloatFunctional(
+            (activation_post_process): Identity()
+          )
+        )
+      )
+      (xif4_2): IRFBlock(
+        (shuffle): ChannelShuffle()
+        (dw): ConvBNRelu(
+          (conv): Conv2d(64, 64, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=64)
+          (bn): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (pwl): ConvBNRelu(
+          (conv): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1), groups=2)
+          (bn): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (res_conn): TorchAdd(
+          (add_func): FloatFunctional(
+            (activation_post_process): Identity()
+          )
+        )
+      )
+      (xif4_3): IRFBlock(
+        (pw): ConvBNRelu(
+          (conv): Conv2d(64, 384, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(384, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (dw): ConvBNRelu(
+          (conv): Conv2d(384, 384, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=384)
+          (bn): BatchNorm2d(384, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (pwl): ConvBNRelu(
+          (conv): Conv2d(384, 64, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (res_conn): TorchAdd(
+          (add_func): FloatFunctional(
+            (activation_post_process): Identity()
+          )
+        )
+      )
+      (xif4_4): IRFBlock(
+        (pw): ConvBNRelu(
+          (conv): Conv2d(64, 384, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(384, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (dw): ConvBNRelu(
+          (conv): Conv2d(384, 384, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=384)
+          (bn): BatchNorm2d(384, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (pwl): ConvBNRelu(
+          (conv): Conv2d(384, 112, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(112, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (xif4_5): IRFBlock(
+        (shuffle): ChannelShuffle()
+        (dw): ConvBNRelu(
+          (conv): Conv2d(112, 112, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=112)
+          (bn): BatchNorm2d(112, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (pwl): ConvBNRelu(
+          (conv): Conv2d(112, 112, kernel_size=(1, 1), stride=(1, 1), groups=2)
+          (bn): BatchNorm2d(112, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (res_conn): TorchAdd(
+          (add_func): FloatFunctional(
+            (activation_post_process): Identity()
+          )
+        )
+      )
+      (xif4_6): IRFBlock(
+        (pw): ConvBNRelu(
+          (conv): Conv2d(112, 336, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(336, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (dw): ConvBNRelu(
+          (conv): Conv2d(336, 336, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=336)
+          (bn): BatchNorm2d(336, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (pwl): ConvBNRelu(
+          (conv): Conv2d(336, 112, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(112, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (res_conn): TorchAdd(
+          (add_func): FloatFunctional(
+            (activation_post_process): Identity()
+          )
+        )
+      )
+      (xif4_7): IRFBlock(
+        (shuffle): ChannelShuffle()
+        (dw): ConvBNRelu(
+          (conv): Conv2d(112, 112, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=112)
+          (bn): BatchNorm2d(112, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (pwl): ConvBNRelu(
+          (conv): Conv2d(112, 112, kernel_size=(1, 1), stride=(1, 1), groups=2)
+          (bn): BatchNorm2d(112, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (res_conn): TorchAdd(
+          (add_func): FloatFunctional(
+            (activation_post_process): Identity()
+          )
+        )
+      )
+      (xif5_0): IRFBlock(
+        (pw): ConvBNRelu(
+          (conv): Conv2d(112, 672, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(672, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (dw): ConvBNRelu(
+          (conv): Conv2d(672, 672, kernel_size=(5, 5), stride=(2, 2), padding=(2, 2), groups=672)
+          (bn): BatchNorm2d(672, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (pwl): ConvBNRelu(
+          (conv): Conv2d(672, 184, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(184, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (xif5_1): IRFBlock(
+        (pw): ConvBNRelu(
+          (conv): Conv2d(184, 1104, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(1104, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (dw): ConvBNRelu(
+          (conv): Conv2d(1104, 1104, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=1104)
+          (bn): BatchNorm2d(1104, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (pwl): ConvBNRelu(
+          (conv): Conv2d(1104, 184, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(184, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (res_conn): TorchAdd(
+          (add_func): FloatFunctional(
+            (activation_post_process): Identity()
+          )
+        )
+      )
+      (xif5_2): IRFBlock(
+        (pw): ConvBNRelu(
+          (conv): Conv2d(184, 552, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(552, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (dw): ConvBNRelu(
+          (conv): Conv2d(552, 552, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=552)
+          (bn): BatchNorm2d(552, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (pwl): ConvBNRelu(
+          (conv): Conv2d(552, 184, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(184, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (res_conn): TorchAdd(
+          (add_func): FloatFunctional(
+            (activation_post_process): Identity()
+          )
+        )
+      )
+      (xif5_3): IRFBlock(
+        (pw): ConvBNRelu(
+          (conv): Conv2d(184, 1104, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(1104, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (dw): ConvBNRelu(
+          (conv): Conv2d(1104, 1104, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=1104)
+          (bn): BatchNorm2d(1104, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (pwl): ConvBNRelu(
+          (conv): Conv2d(1104, 184, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(184, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (res_conn): TorchAdd(
+          (add_func): FloatFunctional(
+            (activation_post_process): Identity()
+          )
+        )
+      )
+      (xif5_4): IRFBlock(
+        (pw): ConvBNRelu(
+          (conv): Conv2d(184, 1104, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(1104, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (dw): ConvBNRelu(
+          (conv): Conv2d(1104, 1104, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=1104)
+          (bn): BatchNorm2d(1104, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (pwl): ConvBNRelu(
+          (conv): Conv2d(1104, 352, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(352, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (xif6_0): ConvBNRelu(
+        (conv): Conv2d(352, 1504, kernel_size=(1, 1), stride=(1, 1))
+        (bn): BatchNorm2d(1504, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+      )
+    )
+  )
+  (head): ClsConvHead(
+    (avg_pool): AdaptiveAvgPool2d(output_size=(1, 1))
+    (conv): Conv2d(1504, 1000, kernel_size=(1, 1), stride=(1, 1))
+  )
+)
+
+```
+
+### fbnet-b arch
+```python
+FBNet(
+  (backbone): FBNetBackbone(
+    (stages): Sequential(
+      (xif0_0): ConvBNRelu(
+        (conv): Conv2d(3, 16, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+        (bn): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+      )
+      (xif1_0): IRFBlock(
+        (dw): ConvBNRelu(
+          (conv): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=16)
+          (bn): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (pwl): ConvBNRelu(
+          (conv): Conv2d(16, 16, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (res_conn): TorchAdd(
+          (add_func): FloatFunctional(
+            (activation_post_process): Identity()
+          )
+        )
+      )
+      (xif2_0): IRFBlock(
+        (pw): ConvBNRelu(
+          (conv): Conv2d(16, 96, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (dw): ConvBNRelu(
+          (conv): Conv2d(96, 96, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), groups=96)
+          (bn): BatchNorm2d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (pwl): ConvBNRelu(
+          (conv): Conv2d(96, 24, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(24, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (xif2_1): IRFBlock(
+        (dw): ConvBNRelu(
+          (conv): Conv2d(24, 24, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=24)
+          (bn): BatchNorm2d(24, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (pwl): ConvBNRelu(
+          (conv): Conv2d(24, 24, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(24, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (res_conn): TorchAdd(
+          (add_func): FloatFunctional(
+            (activation_post_process): Identity()
+          )
+        )
+      )
+      (xif2_2): IRFBlock(
+        (dw): ConvBNRelu(
+          (conv): Conv2d(24, 24, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=24)
+          (bn): BatchNorm2d(24, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (pwl): ConvBNRelu(
+          (conv): Conv2d(24, 24, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(24, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (res_conn): TorchAdd(
+          (add_func): FloatFunctional(
+            (activation_post_process): Identity()
+          )
+        )
+      )
+      (xif2_3): IRFBlock(
+        (dw): ConvBNRelu(
+          (conv): Conv2d(24, 24, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=24)
+          (bn): BatchNorm2d(24, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (pwl): ConvBNRelu(
+          (conv): Conv2d(24, 24, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(24, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (res_conn): TorchAdd(
+          (add_func): FloatFunctional(
+            (activation_post_process): Identity()
+          )
+        )
+      )
+      (xif3_0): IRFBlock(
+        (pw): ConvBNRelu(
+          (conv): Conv2d(24, 144, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(144, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (dw): ConvBNRelu(
+          (conv): Conv2d(144, 144, kernel_size=(5, 5), stride=(2, 2), padding=(2, 2), groups=144)
+          (bn): BatchNorm2d(144, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (pwl): ConvBNRelu(
+          (conv): Conv2d(144, 32, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (xif3_1): IRFBlock(
+        (pw): ConvBNRelu(
+          (conv): Conv2d(32, 96, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (dw): ConvBNRelu(
+          (conv): Conv2d(96, 96, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=96)
+          (bn): BatchNorm2d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (pwl): ConvBNRelu(
+          (conv): Conv2d(96, 32, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (res_conn): TorchAdd(
+          (add_func): FloatFunctional(
+            (activation_post_process): Identity()
+          )
+        )
+      )
+      (xif3_2): IRFBlock(
+        (pw): ConvBNRelu(
+          (conv): Conv2d(32, 192, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (dw): ConvBNRelu(
+          (conv): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=192)
+          (bn): BatchNorm2d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (pwl): ConvBNRelu(
+          (conv): Conv2d(192, 32, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (res_conn): TorchAdd(
+          (add_func): FloatFunctional(
+            (activation_post_process): Identity()
+          )
+        )
+      )
+      (xif3_3): IRFBlock(
+        (pw): ConvBNRelu(
+          (conv): Conv2d(32, 192, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (dw): ConvBNRelu(
+          (conv): Conv2d(192, 192, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=192)
+          (bn): BatchNorm2d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (pwl): ConvBNRelu(
+          (conv): Conv2d(192, 32, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (res_conn): TorchAdd(
+          (add_func): FloatFunctional(
+            (activation_post_process): Identity()
+          )
+        )
+      )
+      (xif4_0): IRFBlock(
+        (pw): ConvBNRelu(
+          (conv): Conv2d(32, 192, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (dw): ConvBNRelu(
+          (conv): Conv2d(192, 192, kernel_size=(5, 5), stride=(2, 2), padding=(2, 2), groups=192)
+          (bn): BatchNorm2d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (pwl): ConvBNRelu(
+          (conv): Conv2d(192, 64, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (xif4_1): IRFBlock(
+        (pw): ConvBNRelu(
+          (conv): Conv2d(64, 384, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(384, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (dw): ConvBNRelu(
+          (conv): Conv2d(384, 384, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=384)
+          (bn): BatchNorm2d(384, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (pwl): ConvBNRelu(
+          (conv): Conv2d(384, 64, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (res_conn): TorchAdd(
+          (add_func): FloatFunctional(
+            (activation_post_process): Identity()
+          )
+        )
+      )
+      (xif4_2): Identity()
+      (xif4_3): IRFBlock(
+        (pw): ConvBNRelu(
+          (conv): Conv2d(64, 192, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (dw): ConvBNRelu(
+          (conv): Conv2d(192, 192, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=192)
+          (bn): BatchNorm2d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (pwl): ConvBNRelu(
+          (conv): Conv2d(192, 64, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (res_conn): TorchAdd(
+          (add_func): FloatFunctional(
+            (activation_post_process): Identity()
+          )
+        )
+      )
+      (xif4_4): IRFBlock(
+        (pw): ConvBNRelu(
+          (conv): Conv2d(64, 384, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(384, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (dw): ConvBNRelu(
+          (conv): Conv2d(384, 384, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=384)
+          (bn): BatchNorm2d(384, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (pwl): ConvBNRelu(
+          (conv): Conv2d(384, 112, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(112, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (xif4_5): IRFBlock(
+        (dw): ConvBNRelu(
+          (conv): Conv2d(112, 112, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=112)
+          (bn): BatchNorm2d(112, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (pwl): ConvBNRelu(
+          (conv): Conv2d(112, 112, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(112, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (res_conn): TorchAdd(
+          (add_func): FloatFunctional(
+            (activation_post_process): Identity()
+          )
+        )
+      )
+      (xif4_6): IRFBlock(
+        (dw): ConvBNRelu(
+          (conv): Conv2d(112, 112, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=112)
+          (bn): BatchNorm2d(112, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (pwl): ConvBNRelu(
+          (conv): Conv2d(112, 112, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(112, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (res_conn): TorchAdd(
+          (add_func): FloatFunctional(
+            (activation_post_process): Identity()
+          )
+        )
+      )
+      (xif4_7): IRFBlock(
+        (pw): ConvBNRelu(
+          (conv): Conv2d(112, 336, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(336, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (dw): ConvBNRelu(
+          (conv): Conv2d(336, 336, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=336)
+          (bn): BatchNorm2d(336, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (pwl): ConvBNRelu(
+          (conv): Conv2d(336, 112, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(112, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (res_conn): TorchAdd(
+          (add_func): FloatFunctional(
+            (activation_post_process): Identity()
+          )
+        )
+      )
+      (xif5_0): IRFBlock(
+        (pw): ConvBNRelu(
+          (conv): Conv2d(112, 672, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(672, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (dw): ConvBNRelu(
+          (conv): Conv2d(672, 672, kernel_size=(5, 5), stride=(2, 2), padding=(2, 2), groups=672)
+          (bn): BatchNorm2d(672, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (pwl): ConvBNRelu(
+          (conv): Conv2d(672, 184, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(184, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (xif5_1): IRFBlock(
+        (dw): ConvBNRelu(
+          (conv): Conv2d(184, 184, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=184)
+          (bn): BatchNorm2d(184, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (pwl): ConvBNRelu(
+          (conv): Conv2d(184, 184, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(184, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (res_conn): TorchAdd(
+          (add_func): FloatFunctional(
+            (activation_post_process): Identity()
+          )
+        )
+      )
+      (xif5_2): IRFBlock(
+        (pw): ConvBNRelu(
+          (conv): Conv2d(184, 1104, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(1104, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (dw): ConvBNRelu(
+          (conv): Conv2d(1104, 1104, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=1104)
+          (bn): BatchNorm2d(1104, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (pwl): ConvBNRelu(
+          (conv): Conv2d(1104, 184, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(184, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (res_conn): TorchAdd(
+          (add_func): FloatFunctional(
+            (activation_post_process): Identity()
+          )
+        )
+      )
+      (xif5_3): IRFBlock(
+        (pw): ConvBNRelu(
+          (conv): Conv2d(184, 1104, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(1104, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (dw): ConvBNRelu(
+          (conv): Conv2d(1104, 1104, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=1104)
+          (bn): BatchNorm2d(1104, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (pwl): ConvBNRelu(
+          (conv): Conv2d(1104, 184, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(184, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (res_conn): TorchAdd(
+          (add_func): FloatFunctional(
+            (activation_post_process): Identity()
+          )
+        )
+      )
+      (xif5_4): IRFBlock(
+        (pw): ConvBNRelu(
+          (conv): Conv2d(184, 1104, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(1104, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (dw): ConvBNRelu(
+          (conv): Conv2d(1104, 1104, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=1104)
+          (bn): BatchNorm2d(1104, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (pwl): ConvBNRelu(
+          (conv): Conv2d(1104, 352, kernel_size=(1, 1), stride=(1, 1))
+          (bn): BatchNorm2d(352, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (xif6_0): ConvBNRelu(
+        (conv): Conv2d(352, 1984, kernel_size=(1, 1), stride=(1, 1))
+        (bn): BatchNorm2d(1984, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (relu): ReLU(inplace=True)
+      )
+    )
+  )
+  (head): ClsConvHead(
+    (avg_pool): AdaptiveAvgPool2d(output_size=(1, 1))
+    (conv): Conv2d(1984, 1000, kernel_size=(1, 1), stride=(1, 1))
+  )
+)
+```
+
+## Depth-wise Separable Conv net
+步骤 A: Depthwise Convolution (深度卷积)
+
+    操作： 针对输入的每个通道，独立地使用一个单通道的滤波器 (K×K×1) 进行空间卷积。
+
+    作用： 只负责提取空间特征，如边缘、纹理等，但不会在通道之间混合信息。
+
+    结果： 保持通道数不变。如果输入有 Cin​ 个通道，输出也有 Cin​ 个通道。
+
+    参数量： 极少，仅为 K×K×Cin​。
+
+步骤 B: Pointwise Convolution (逐点卷积)
+
+    操作： 使用 1×1 的卷积核。这个 1×1×Cin​ 的卷积核会在空间上滑动，对深度卷积的输出进行跨通道加权求和。
+
+    作用： 只负责通道融合和通道数调整。它将深度卷积中分离的特征图进行线性组合，生成新的 Cout​ 个输出通道。
+
+    参数量：1×1×Cin​×Cout​。 
+
