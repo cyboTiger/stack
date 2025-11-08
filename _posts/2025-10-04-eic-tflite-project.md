@@ -914,3 +914,27 @@ FBNet(
 
     参数量：1×1×Cin​×Cout​。 
 
+
+```
+Keras 推理完成。总耗时: 132.9528 秒
+Keras 吞吐量 (FPS): 7.39 样本/秒
+
+TFLite 推理中: 100%|██████████████████████████████████████████████████████| 982/982 [00:05<00:00, 183.37it/s]
+TFLite 推理完成。总耗时: 5.3581 秒
+TFLite 吞吐量 (FPS): 183.27 样本/秒
+
+PyTorch 推理完成。总耗时: 4.8217 秒
+PyTorch 吞吐量 (FPS): 203.66 样本/秒
+
+--- 精度验证报告 ---
+样本总数: 982
+1. 预测一致性 (INT8 TFLite vs Float32 Keras): (84.62%)
+ (Float32 TFLite vs Float32 Keras): (100.00%)
+
+2. 平均输出 L2 差异 (越小越好): 0.000001(tflite)/0.152170(quantized_tflite)
+3. Keras (Float32) Top-1 精度: 0.0010
+4. TFLite (INT8) Top-1 精度: 0.0010
+4. TFLite (Float32) Top-1 精度: 0.0010
+5. PyTorch (Float32) Top-1 精度: 0.0010
+量化损失 (Float32 - INT8): 0.00%
+```
