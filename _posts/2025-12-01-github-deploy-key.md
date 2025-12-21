@@ -34,7 +34,7 @@ ssh -T git@github.com
 初次建立连接，会有询问信息，输入 yes 后，应该会看到以下内容，则配置成功，可以安全的 push 代码！
 
 ```
-Hi USERNAME! You've successfully authenticated, but GitHub does not provide shell access.
+Hi USERNAME/REPO! You've successfully authenticated, but GitHub does not provide shell access.
 ```
 
 最后，将 github 仓库的 remote 改成 ssh 连接
@@ -57,10 +57,17 @@ Host github.com-vllm
         IdentityFile=/home/your-username/.ssh/id_rsa_1
 ``` 
 
-因为 ssh 连接默认使用 id_rsa 密钥，所以在管理 vllm 项目时，初次连接需要
+然后可以测试仓库和对应 deploy key 的连接
 
 ```bash
 ssh -T -i ~/.ssh/id_rsa_1 git@github.com-vllm
 ```
 
-来强制使用 id_rsa_1 密钥对
+因为 ssh 连接默认使用 id_rsa 密钥，所以每个仓库的 remote url 应该配置为域名别名
+
+```bash
+git remote set-url origin git@github.com-vllm:USERNAME/VLLM-REPO.git
+
+git remote set-url origin git@github.com-sglang:USERNAME/SGLANG-REPO.git
+```
+
