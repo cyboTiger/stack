@@ -3,7 +3,7 @@ title: Github deploy key 的使用
 description: 通过 deploy key 在远程服务器安全的管理单个仓库
 author: cybotiger
 date: 2025-12-01 07:00:00 +0800
-categories: [网络, 工具]
+categories: [开发, 网络]
 tags: []
 ---
 

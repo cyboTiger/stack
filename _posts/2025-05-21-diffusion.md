@@ -4,7 +4,7 @@ description: >-
   diffusion原理与架构
 author: cybotiger
 date: 2025-05-21 12:00:00 +0800
-categories: [AI]
+categories: [AI, 神经网络]
 tags: []
 math: true
 mermaid: true
