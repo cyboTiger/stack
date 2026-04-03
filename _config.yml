@@ -15,7 +15,7 @@ timezone: Asia/Shanghai
 # --------------------------
 title: cyboTiger # 主标题
 
-tagline: ML stack # 副标题
+tagline: Tech stack # 副标题
 
 description: >- # 由 seo meta 和 atom feed 使用
   cyboTiger 的个人博客
