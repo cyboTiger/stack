@@ -187,7 +187,7 @@ pwa:
 paginate: 10
 
 # The base URL of your site
-baseurl: "/stack"
+baseurl: ""
 
 # ------------ 下面的设置不建议修改 ------------------
 
