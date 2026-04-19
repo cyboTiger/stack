@@ -8,6 +8,7 @@
 !.stylelintrc.json
 !.gems/
 
+.DS_Store
 # Bundler cache
 .bundle
 vendor
